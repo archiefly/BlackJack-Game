@@ -85,7 +85,7 @@ public class BlackjackGameUI extends JFrame {
 
     private ImageIcon loadCardImage(Card card) {
         String cardName = card.getRank().name().toLowerCase() + "_" + card.getSuit().name().toLowerCase() + ".png";
-        String imagePath = "images/cards/" + cardName;
+        String imagePath = "Images/" + cardName;
         return new ImageIcon(getClass().getResource(imagePath));
     }
 
