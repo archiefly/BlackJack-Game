@@ -9,10 +9,11 @@ import javax.smartcardio.Card;
 public class Player {
 
     private String name;
-    private CardDeck.Card[] hand;
+    private Card[] hand;
     private boolean isBusted;
     private boolean isStanding;
     private int score;
+    private int winPoint;
 
     /**
      * Constructor to create a new player with a specified name.
@@ -21,7 +22,7 @@ public class Player {
      */
     public Player(String name) {
         this.name = name;
-        this.hand = new CardDeck.Card[6];
+        this.hand = new Card[6];
         this.score = setScore();
         this.isBusted = setBust();
         this.isStanding = false;
@@ -42,7 +43,7 @@ public class Player {
      * @param i       the index at which to place the card
      * @param newHand the card to add to the player's hand
      */
-    private void setHand(int i, CardDeck.Card newHand) {
+    private void setHand(int i, Card newHand) {
         this.hand[i] = newHand;
     }
 
@@ -81,6 +82,10 @@ public class Player {
         return calculateHandValue();
     }
 
+    public void addWinPoint() {
+        this.winPoint = this.winPoint + 1;
+    }
+
     /**
      * Retrieves the player's name.
      *
@@ -96,7 +101,7 @@ public class Player {
      * @param i the index of the card in the player's hand
      * @return the card at the specified index
      */
-    public CardDeck.Card getHand(int i) {
+    public Card getHand(int i) {
         return this.hand[i];
     }
 
@@ -127,16 +132,20 @@ public class Player {
         return this.score;
     }
 
+    public int getWinPoint() {
+        return this.winPoint;
+    }
+
     /**
      * Adds a card to the player's hand. It finds the first available position in the hand 
      * (where the slot is {@code null}) and assigns the new card to that position.
      *
      * @param card the card to be added to the player's hand
      */
-    private void addCard(CardDeck.Card card) {
+    private void addCard(Card newCard) {
         for (int i = 0; i < 6; i++) {
             if (getHand(i) == null) {
-                setHand(i, card);
+                setHand(i, newCard);
                 break;
             }
         }
@@ -174,9 +183,7 @@ public class Player {
      * - A card is added to the player's hand if they are not standing.
      * - The player's status is updated to "busted" if their score exceeds 21.
      */
-    public void hit() {
-        CardDeck.Card newCard;
-        newCard = dealCard();
+    public void hit(Card newCard) {
         if (!getIsStanding()) {
             addCard(newCard);
         }
