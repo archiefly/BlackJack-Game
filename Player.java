@@ -10,9 +10,8 @@ public class Player {
 
     private String name;
     private Card[] hand;
-    private boolean isBusted;
+    private boolean isBusted = setBust();
     private boolean isStanding;
-    private int score;
     private int winPoint;
 
     /**
@@ -22,9 +21,7 @@ public class Player {
      */
     public Player(String name) {
         this.name = name;
-        this.hand = new Card[6];
-        this.score = setScore();
-        this.isBusted = setBust();
+        this.hand = new Card[10];
         this.isStanding = false;
     }
 
@@ -54,6 +51,13 @@ public class Player {
         isStanding = true;
     }
 
+        /**
+     * Sets the player's status to not standing, indicating they do not wish to draw more cards.
+     */
+    public void resetStand() {
+        isStanding = false;
+    }
+
     /**
      * Determines whether the player has busted (score > 21) and sets the bust status accordingly.
      * If the player is busted, it also sets the player's status to standing.
@@ -61,25 +65,12 @@ public class Player {
      * @return {@code true} if the player is busted; {@code false} otherwise
      */
     private boolean setBust() {
-        if (getScore() > 21) {
+        if (calculateHandValue() > 21) {
             setStand();
             return true;
         } else {
             return false;
         }
-    }
-
-    /**
-     * Calculates and sets the player's score based on the value of the cards in their hand.
-     *
-     * @return the player's current score
-     * @throws IllegalArgumentException if the calculated score is negative
-     */
-    private int setScore() {
-        if (calculateHandValue() < 0) {
-            throw new IllegalArgumentException("Score cannot be negative");
-        }
-        return calculateHandValue();
     }
 
     public void addWinPoint() {
@@ -123,15 +114,6 @@ public class Player {
         return this.isStanding;
     }
 
-    /**
-     * Retrieves the player's current score.
-     *
-     * @return the player's score
-     */
-    public int getScore() {
-        return this.score;
-    }
-
     public int getWinPoint() {
         return this.winPoint;
     }
@@ -143,7 +125,7 @@ public class Player {
      * @param card the card to be added to the player's hand
      */
     private void addCard(Card newCard) {
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 10; i++) {
             if (getHand(i) == null) {
                 setHand(i, newCard);
                 break;
@@ -156,14 +138,28 @@ public class Player {
      *
      * @return the total value of the player's hand
      */
-    private int calculateHandValue() {
+    public int calculateHandValue() {
         int value = 0;
-        for (int i = 0; i < 6; i++) {
+        int aceCount = 0;
+        for (int i = 0; i < 10; i++) {
             if (getHand(i) == null) {
                 break;
             } else {
+                if (getHand(i).getRank() == Rank.Ace) {
+                    aceCount = aceCount + 1;
+                }
                 value += getHand(i).getRank().getValue();
             }
+        }
+        for (int i = 0; i < aceCount; i++) {
+            if (value > 21) {
+                value = value - 10;
+            } else {
+                break;
+            }
+        }
+        if (value < 0) {
+            throw new IllegalArgumentException("Score cannot be negative");
         }
         return value;
     }
@@ -187,7 +183,7 @@ public class Player {
         if (!getIsStanding()) {
             addCard(newCard);
         }
-        if (getScore() > 21) {
+        if (calculateHandValue() > 21) {
             setBust();
         }
     }
@@ -196,7 +192,7 @@ public class Player {
      * Resets the player's hand by setting all card slots in the hand array to {@code null}.
      */
     public void resetHand() {
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 10; i++) {
             setHand(i, null);
         }
     }
@@ -217,6 +213,6 @@ public class Player {
         } else {
             status = " is still playing the round";
         }
-        return getName() + " has a score of " + getScore() + status;
+        return getName() + " has a score of " + calculateHandValue() + status;
     }
 }
