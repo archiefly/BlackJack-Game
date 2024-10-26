@@ -116,12 +116,13 @@ public class RoundClass {
         player.addCard(roundCardDeck.dealCard());
         dealer.addCard(roundCardDeck.dealCard());
 
+        BlackjackGameUI blackjackGameUI = new BlackjackGameUI();
         while (!player.getIsBusted() && !player.getIsStanding()) {
             // Prompt for hit or stand
             //Select button for hit or stand
-            if (/*hit */) {
+            if (blackjackGameUI.dealCardToPlayer()) {
                 player.hit(roundCardDeck.dealCard());
-            } else if (/*stand */) {
+            } else if (blackjackGameUI.handleStand()) {
                 player.setStand();
             }
         }
@@ -135,7 +136,7 @@ public class RoundClass {
      * Completes the round by calculating the final scores and awarding bets based on the result.
      */
     public void completeRound() {
-        setBet(/*player chooses bet */);
+        getBet(/*player chooses bet */);
         while (findWinner() == null) {
             playRound();
         }

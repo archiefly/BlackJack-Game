@@ -1,35 +1,37 @@
-import java.awt.*;
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.*;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 public class BlackjackGameUI extends JFrame {
-    private JLabel playerLabel, dealerLabel, statusLabel;
-    private JButton hitButton, standButton, newGameButton;
-    private JPanel playerPanel, dealerPanel, buttonPanel, statusPanel;
+    private JPanel playerPanel;
+    private JPanel dealerPanel;
+    private JPanel buttonPanel;
+    private JPanel statusPanel;
+    private JLabel statusLabel;
+    private JButton hitButton;
+    private JButton standButton;
+    private JButton newGameButton;
+    private CardDeck cardDeck; // Assuming cardDeck is an instance of CardDeck
 
     public BlackjackGameUI() {
-        setTitle("Blackjack Game");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(600, 400);
-        setLayout(new BorderLayout());
-
-        // Create the player and dealer panels for showing cards
+        // Initialize panels and buttons
         playerPanel = new JPanel();
         dealerPanel = new JPanel();
-        playerPanel.setBorder(BorderFactory.createTitledBorder("Player's Cards"));
-        dealerPanel.setBorder(BorderFactory.createTitledBorder("Dealer's Cards"));
-
-        // Status panel to show the outcome of the game
+        buttonPanel = new JPanel();
         statusPanel = new JPanel();
         statusLabel = new JLabel("Game Status: ");
-        statusPanel.add(statusLabel);
-
-        // Buttons for actions
-        buttonPanel = new JPanel();
         hitButton = new JButton("Hit");
         standButton = new JButton("Stand");
         newGameButton = new JButton("New Game");
+
+        // Add buttons to button panel
         buttonPanel.add(hitButton);
         buttonPanel.add(standButton);
         buttonPanel.add(newGameButton);
@@ -44,7 +46,7 @@ public class BlackjackGameUI extends JFrame {
         hitButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // Call logic to deal a card to the player
-                handleHit();
+                dealCardToPlayer();
             }
         });
 
@@ -58,31 +60,52 @@ public class BlackjackGameUI extends JFrame {
         newGameButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // Reset the game and start a new round
-                handleNewGame();
+                startNewGame();
             }
         });
 
-        setVisible(true);
+        // Initialize the card deck
+        cardDeck = new CardDeck();
+
+        // Automatically deal a card to the player when the UI initializes
+        dealCardToPlayer();
     }
 
-    private void handleHit() {
-        // Logic to add a card to the player's hand
-        // Update the UI with the new card
-        statusLabel.setText("You hit!");
+    public boolean dealCardToPlayer() {
+        Card card = cardDeck.dealCard(); // Assuming cardDeck is an instance of CardDeck
+        if (card != null) {
+            ImageIcon cardImage = loadCardImage(card);
+            JLabel cardLabel = new JLabel(cardImage);
+            playerPanel.add(cardLabel);
+            playerPanel.revalidate();
+            playerPanel.repaint();
+        }
+        return true;
     }
 
-    private void handleStand() {
-        // Logic for standing, check dealer's turn
-        // Update the game status
-        statusLabel.setText("You stand!");
+    private ImageIcon loadCardImage(Card card) {
+        String cardName = card.getRank().name().toLowerCase() + "_" + card.getSuit().name().toLowerCase() + ".png";
+        String imagePath = "images/cards/" + cardName;
+        return new ImageIcon(getClass().getResource(imagePath));
     }
 
-    private void handleNewGame() {
-        // Reset the game state and UI for a new game
-        statusLabel.setText("New game started!");
+    public boolean handleStand() {
+        // Logic for standing
+        return true; // Placeholder return value
+    }
+
+    private void startNewGame() {
+        // Logic for starting a new game
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new BlackjackGameUI());
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                BlackjackGameUI gameUI = new BlackjackGameUI();
+                gameUI.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                gameUI.setSize(800, 600);
+                gameUI.setVisible(true);
+            }
+        });
     }
 }
