@@ -1,21 +1,30 @@
-import java.util.List;
-import javax.smartcardio.Card;
-
 /**
  * The {@code Player} class represents a player in a card game.
- * It contains information about the player's name, hand, score, and current status 
- * (e.g., standing or busted).
+ * It manages the player's name, hand, current score, and status 
+ * (e.g., standing or busted). The class includes methods for adding 
+ * cards to the player's hand, calculating the hand's total value, 
+ * and resetting the player's state.
  */
 public class Player {
 
+    /** The name of the player. */
     private String name;
+    
+    /** The array representing the player's hand of cards. */
     private Card[] hand;
+
+    /** Flag indicating if the player is currently busted (score > 21). */
     private boolean isBusted = setBust();
+
+    /** Flag indicating if the player is standing, meaning they do not want more cards. */
     private boolean isStanding;
+
+    /** The player's current win points. */
     private int winPoint;
 
     /**
-     * Constructor to create a new player with a specified name.
+     * Constructs a new {@code Player} with the specified name.
+     * Initializes the player's hand and sets default values for status and score.
      *
      * @param name the name of the player
      */
@@ -51,16 +60,16 @@ public class Player {
         isStanding = true;
     }
 
-        /**
-     * Sets the player's status to not standing, indicating they do not wish to draw more cards.
+    /**
+     * Resets the player's standing status to allow drawing more cards.
      */
     public void resetStand() {
         isStanding = false;
     }
 
     /**
-     * Determines whether the player has busted (score > 21) and sets the bust status accordingly.
-     * If the player is busted, it also sets the player's status to standing.
+     * Determines whether the player has busted (score > 21) and sets the bust status.
+     * If the player is busted, sets the player's status to standing.
      *
      * @return {@code true} if the player is busted; {@code false} otherwise
      */
@@ -73,8 +82,11 @@ public class Player {
         }
     }
 
+    /**
+     * Increments the player's win points by 1.
+     */
     public void addWinPoint() {
-        this.winPoint = this.winPoint + 1;
+        this.winPoint++;
     }
 
     /**
@@ -90,7 +102,7 @@ public class Player {
      * Retrieves the card at the specified index in the player's hand.
      *
      * @param i the index of the card in the player's hand
-     * @return the card at the specified index
+     * @return the card at the specified index, or {@code null} if the slot is empty
      */
     public Card getHand(int i) {
         return this.hand[i];
@@ -114,15 +126,19 @@ public class Player {
         return this.isStanding;
     }
 
+    /**
+     * Retrieves the player's win points.
+     *
+     * @return the number of win points the player has accumulated
+     */
     public int getWinPoint() {
         return this.winPoint;
     }
 
     /**
-     * Adds a card to the player's hand. It finds the first available position in the hand 
-     * (where the slot is {@code null}) and assigns the new card to that position.
-     *
-     * @param card the card to be added to the player's hand
+     * Adds a card to the player's hand at the first available position.
+     * 
+     * @param newCard the card to add to the player's hand
      */
     private void addCard(Card newCard) {
         for (int i = 0; i < 10; i++) {
@@ -134,50 +150,47 @@ public class Player {
     }
 
     /**
-     * Calculates the total value of the player's hand by summing up the values of the cards.
+     * Calculates the total value of the player's hand by summing the values of each card.
+     * Adjusts for Aces to prevent busting if the hand's total exceeds 21.
      *
      * @return the total value of the player's hand
+     * @throws IllegalArgumentException if the score is negative (should not occur under normal rules)
      */
     public int calculateHandValue() {
         int value = 0;
         int aceCount = 0;
+
         for (int i = 0; i < 10; i++) {
             if (getHand(i) == null) {
                 break;
             } else {
                 if (getHand(i).getRank() == Rank.Ace) {
-                    aceCount = aceCount + 1;
+                    aceCount++;
                 }
                 value += getHand(i).getRank().getValue();
             }
         }
+
+        // Adjust for Aces if value exceeds 21
         for (int i = 0; i < aceCount; i++) {
             if (value > 21) {
-                value = value - 10;
+                value -= 10;
             } else {
                 break;
             }
         }
+
         if (value < 0) {
             throw new IllegalArgumentException("Score cannot be negative");
         }
+
         return value;
     }
 
     /**
-     * Draws a card from the deck and adds it to the player's hand.
+     * Adds a card to the player's hand if they are not standing and updates bust status.
      * 
-     * This method checks if the player is standing; if not, a card is drawn from the deck using 
-     * the {@code dealCard()} method and added to the player's hand using {@code addCard()}.
-     * If the player's score exceeds 21 after drawing the card, the player is set to be "busted" 
-     * using {@code setBust()}.
-     * 
-     * Preconditions:
-     * - The player should not be standing.
-     * 
-     * Postconditions:
-     * - A card is added to the player's hand if they are not standing.
-     * - The player's status is updated to "busted" if their score exceeds 21.
+     * @param newCard the card to add to the player's hand
      */
     public void hit(Card newCard) {
         if (!getIsStanding()) {
@@ -189,7 +202,7 @@ public class Player {
     }
 
     /**
-     * Resets the player's hand by setting all card slots in the hand array to {@code null}.
+     * Clears all cards from the player's hand by setting each slot to {@code null}.
      */
     public void resetHand() {
         for (int i = 0; i < 10; i++) {
