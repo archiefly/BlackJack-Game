@@ -7,20 +7,12 @@
  */
 public class Player {
 
-    /** The name of the player. */
     private String name;
-    
-    /** The array representing the player's hand of cards. */
     private Card[] hand;
-
-    /** Flag indicating if the player is currently busted (score > 21). */
     private boolean isBusted = setBust();
-
-    /** Flag indicating if the player is standing, meaning they do not want more cards. */
     private boolean isStanding;
-
-    /** The player's current win points. */
     private int winPoint;
+    private double money;
 
     /**
      * Constructs a new {@code Player} with the specified name.
@@ -32,6 +24,7 @@ public class Player {
         this.name = name;
         this.hand = new Card[10];
         this.isStanding = false;
+        this.money = 500;
     }
 
     /**
@@ -89,6 +82,10 @@ public class Player {
         this.winPoint++;
     }
 
+    public void setMoney(double i) {
+        this.money = getMoney() + i;
+    }
+
     /**
      * Retrieves the player's name.
      *
@@ -135,6 +132,10 @@ public class Player {
         return this.winPoint;
     }
 
+    public double getMoney() {
+        return this.money;
+    }
+
     /**
      * Adds a card to the player's hand at the first available position.
      * 
@@ -154,7 +155,8 @@ public class Player {
      * Adjusts for Aces to prevent busting if the hand's total exceeds 21.
      *
      * @return the total value of the player's hand
-     * @throws IllegalArgumentException if the score is negative (should not occur under normal rules)
+     * @throws IllegalArgumentException if the score is negative 
+     *      (should not occur under normal rules)
      */
     public int calculateHandValue() {
         int value = 0;
