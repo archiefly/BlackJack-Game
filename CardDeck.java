@@ -1,85 +1,53 @@
-
 import java.util.ArrayList;
 import java.util.Collections;
-import javax.smartcardio.Card;
 
+/**
+ * The {@code CardDeck} class represents a standard deck of playing cards.
+ * It provides methods for initializing the deck, shuffling, and dealing cards.
+ */
 public class CardDeck {
-
-    public class Card {
-
-        private final Suit suit;
-        private final Rank rank;
-
-        public Card(Suit suit, Rank rank) {
-            this.suit = suit;
-            this.rank = rank;
-        }
-
-        public Suit getSuit() {
-            return suit;
-        }
-
-        public Rank getRank() {
-            return rank;
-        }
-
-        public String toString() {
-            return rank + " of " + suit;
-        }
-    }
-
-    public enum Suit {
-        Hearts,
-        Diamonds,
-        Clubs,
-        Spades
-    }
-
-    public enum Rank {
-        Two(2),
-        Three(3),
-        Four(4),
-        Five(5),
-        Six(6),
-        Seven(7),
-        Eight(8),
-        Nine(9),
-        Ten(10),
-        Jack(10),
-        Queen(10),
-        King(10),
-        Ace(11);
-
-        private final int value;
-
-        Rank(int value) {
-            this.value = value;
-        }
-
-        public int getValue() {
-            return value;
-        }
-    }
-    public class CardDeck {
-        private ArrayList<Card> cards;
     
-        public CardDeck() {
-            cards = new ArrayList<>();
-            for (Suit suit : Suit.values()) {
-                for (Rank rank : Rank.values()) {
-                    cards.add(new Card(suit, rank));
-                }
+    /** 
+     * The list of cards in the deck.
+     */
+    private ArrayList<Card> cards;
+
+    /**
+     * Initializes the deck with an empty list of cards.
+     * This method is called internally by the constructor to prepare for adding cards.
+     */
+    public void setDeck() {
+        this.cards = new ArrayList<>();
+    }
+
+    /**
+     * Constructs a new {@code CardDeck} with a full set of cards.
+     * Initializes the deck with all combinations of suits and ranks,
+     * then shuffles the deck to randomize the order of the cards.
+     */
+    public CardDeck() {
+        setDeck();
+        for (Suit suit : Suit.values()) {
+            for (Rank rank : Rank.values()) {
+                cards.add(new Card(suit, rank));
             }
-            shuffle();
         }
-    
-        public void shuffle() {
-            Collections.shuffle(cards);
-        }
-    
-        public Card dealCard() {
-            return cards.remove(cards.size() - 1);
-        }
+        shuffle();
     }
-    
+
+    /**
+     * Shuffles the deck, randomizing the order of the cards.
+     */
+    public void shuffle() {
+        Collections.shuffle(cards);
+    }
+
+    /**
+     * Deals a card from the deck by removing the last card.
+     * 
+     * @return the card removed from the deck, or {@code null} if the deck is empty
+     */
+    public Card dealCard() {
+        return cards.isEmpty() ? null : cards.remove(cards.size() - 1);
+    }
 }
