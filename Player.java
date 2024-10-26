@@ -140,7 +140,7 @@ public class Player {
      * 
      * @param newCard the card to add to the player's hand
      */
-    private void addCard(Card newCard) {
+    public void addCard(Card newCard) {
         for (int i = 0; i < 10; i++) {
             if (getHand(i) == null) {
                 setHand(i, newCard);
