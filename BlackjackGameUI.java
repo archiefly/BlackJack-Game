@@ -6,7 +6,6 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -210,28 +209,8 @@ public class BlackjackGameUI extends JFrame {
             playerPanel.add(cardLabel);
             playerPanel.revalidate();
             playerPanel.repaint();
-
-            // Calculate player's hand value
-            playerHandValue = 0;
-            int aceCount = 0;
-            for (Card c : playerHand) {
-                playerHandValue += c.getRank().getValue();
-                if (c.getRank() == Rank.Ace) {
-                    aceCount++;
-                }
-            }
-
-            // Adjust for Aces if player is busted
-            while (playerHandValue > 21 && aceCount > 0) {
-                playerHandValue -= 10; // Change Ace value from 11 to 1
-                aceCount--;
-            }
-
-            // Update player's hand value label
-            playerHandValueLabel.setText("Player Hand Value: " + playerHandValue);
-
-            // Check if player is busted
-            if (playerHandValue > 21) {
+            
+            if (player.getIsBusted()) {
                 statusLabel.setText("Game Status: Busted!");
                 hitButton.setEnabled(false);
                 standButton.setEnabled(false);
