@@ -1,23 +1,32 @@
-How to Play
-Start the Game:(To start the game you need to run BlackjackGameUI.java) When the game starts, both the player and dealer are dealt two cards.
+How to Play:
+            Start the Game:(To start the game you need to run BlackjackGameUI.java) When the game starts, both the player and dealer are dealt two cards.
+
 Player Actions:
-Hit: Draw a card from the deck.
-Stand: End your turn, allowing the dealer to play.
-Dealer's Turn: The dealer will follow standard Blackjack rules (e.g., hitting until reaching 17 or higher).
+Hit:                    Draw a card from the deck.
+Stand:                  End your turn, allowing the dealer to play.
+Dealer's Turn:          The dealer will follow standard Blackjack rules (e.g., hitting until reaching 17 or higher).
 Winning:
-If your hand's total is closer to 21 than the dealer's, you win!
-If your hand exceeds 21, you "bust" and lose the game.
-If both hands tie, the result is a "push" (no winner).
-New Game: Click the "New Game" button to reset and start a new round.
-Classes Overview
-Card.java: Represents an individual playing card, defined by a Rank (e.g., Ace, King) and a Suit (e.g., Hearts, Spades).
+                        If your hand's total is closer to 21 than the dealer's, you win!
+                        If your hand exceeds 21, you "bust" and lose the game.
+                        If both hands tie, the result is a "push" (no winner).
+                        New Round: Click the "New Round" button to reset and start a new round.
+                        Restart Game: Click on the "Restart Game button to restart the game and delete round betting history.
 
-CardDeck.java: Manages a deck of cards, with functionality to shuffle and deal cards randomly.
 
-Player.java: Manages the player's hand of cards and calculates the score based on card values.
+Class Descriptions:
+Card:                   It provides methods to access the suit and rank of the card, as well as a string representation.
+CardDeck:               It provides methods for initializing the deck, shuffling, and dealing cards.
+Player:                 It manages the player's name, hand, current score, money, win points, 
+                        and status (e.g., standing or busted). The class includes methods 
+                        for adding cards to the player's hand, calculating the hand's total value,
+                        and resetting the player's state.
+RoundClass:             Represents a single round of the game, managing players' hands, 
+                        actions, and determining the round's outcome.
+BlackjackGameUI:        Plays the game and makes the UI
 
-Rank.java (Enum): Defines the ranks of cards (Ace, Two, King, etc.) and their associated values used in Blackjack scoring.
 
-Suit.java (Enum): Defines the four card suits (Hearts, Diamonds, Clubs, Spades).
+Special Feature 1: 
+Github: https://github.com/archiefly/Poker-Game.git
 
-BlackjackGameUI.java: The graphical user interface for the game, providing buttons and panels for interacting with the game. It handles user input and updates the game state.
+Special Feature 2: 
+UI experience with betting to make it more interesting. Didn't work unfortunately.
