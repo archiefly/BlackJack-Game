@@ -1,14 +1,20 @@
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Represents a single round of the game, managing players' hands, 
  * actions, and determining the round's outcome.
  */
 public class RoundClass {
 
+    // Static fields that represent a shared state across all instances, if any
+    private static List<RoundClass> allRounds = new ArrayList<>();
+
     private int round;
     private CardDeck roundCardDeck;
-    private boolean finished = setFinished();
-    private Player player = GameClass.getPlayer();
-    private Player dealer = GameClass.getDealer();
+    private boolean finished;
+    private Player player;
+    private Player dealer;
     private int bet;
 
     /**
@@ -19,6 +25,8 @@ public class RoundClass {
      */
     public RoundClass(int round) {
         this.round = round;
+        player = BlackjackGameUI.getPlayer();
+        dealer = BlackjackGameUI.getDealer();
         this.roundCardDeck = new CardDeck();
         dealer.resetHand();
         dealer.resetStand();
@@ -26,6 +34,27 @@ public class RoundClass {
         player.resetStand();
         this.finished = false;
         this.bet = 0;
+        allRounds.add(this); // Add this instance to the tracking list
+    }
+
+    /**
+     * Clears all tracked instances and resets static fields.
+     */
+    public static void resetAllRounds() {
+        for (RoundClass round : allRounds) {
+            round.clearRound();  // Calls the clear method we defined earlier
+        }
+        allRounds.clear();       // Clear the tracking list
+    }
+
+    private void clearRound() {
+        // Reset fields specific to this instance
+        this.round = 0;
+        this.roundCardDeck = null;
+        this.finished = false;
+        this.bet = 0;
+        this.player = null;
+        this.dealer = null;
     }
 
     /**
@@ -49,6 +78,14 @@ public class RoundClass {
         return this.bet;
     }
 
+    private CardDeck getRoundCardDeck() {
+        return this.roundCardDeck;
+    }
+
+    public void newRound() {
+        this.round += 1;
+    }
+
     /**
      * Sets the bet amount if it falls within the allowed range.
      *
@@ -70,18 +107,18 @@ public class RoundClass {
      * Determines whether the round is finished based on both players' states.
      *
      * @return {@code true} if the round is complete, otherwise {@code false}
-     */
-    private boolean setFinished() {
+     *
+    private void setFinished() {
         if (dealer.getIsStanding() && player.getIsStanding()) {
-            if (findWinner() == null) {
-                return false;
-            } else {
+            if (findWinner() != null) {
                 findWinner().addWinPoint();
-                return true;
             }
-        } else {
-            return false;
         }
+    }
+    */
+
+    public Card dealRoundCard() {
+        return getRoundCardDeck().dealCard();
     }
 
     /**
@@ -89,54 +126,44 @@ public class RoundClass {
      *
      * @return the winning player, or {@code null} if there is no winner
      */
-    private Player findWinner() {
+    public Player findWinner() {
         if (player.getIsBusted() && dealer.getIsBusted()) {
             return null;
-        } else if (!player.getIsBusted()) {
+        } else if (!player.getIsBusted() && dealer.getIsBusted()) {
+            player.addWinPoint();
+            return player;
+        } else if (player.getIsBusted() && !dealer.getIsBusted()) {
+            dealer.addWinPoint();
+            return dealer;
+        } else {
             if (player.calculateHandValue() > dealer.calculateHandValue()) {
+                player.addWinPoint();
                 return player;
-            } else if ((player.calculateHandValue() < dealer.calculateHandValue()) 
-                && !dealer.getIsBusted()) {
+            } else if (player.calculateHandValue() < dealer.calculateHandValue()) {
+                dealer.addWinPoint();
                 return dealer;
             } else {
                 return null;
             }
+        }
+    }
+
+    public String findWinnerToString() {
+        
+        if (findWinner() == player) {
+            return "Game Status: You Win!";
+        } else if (findWinner() == dealer) {
+            return "Game Status: Dealer Wins!";
         } else {
-            return dealer;
+            return "Game Status: Draw!";
         }
     }
 
-    /**
-     * Executes the actions for a single round, dealing initial cards and handling 
-     * both player and dealer actions based on their hand values.
-     */
-    private void playRound() {
-        player.addCard(roundCardDeck.dealCard());
-        dealer.addCard(roundCardDeck.dealCard());
-        player.addCard(roundCardDeck.dealCard());
-        dealer.addCard(roundCardDeck.dealCard());
-
-        BlackjackGameUI blackjackGameUI = new BlackjackGameUI();
-        while (!player.getIsBusted() && !player.getIsStanding()) {
-            // Prompt for hit or stand
-            //Select button for hit or stand
-            if (blackjackGameUI.dealCardToPlayer()) {
-                player.hit(roundCardDeck.dealCard());
-            } else if (blackjackGameUI.handleStand()) {
-                player.setStand();
-            }
-        }
-        while (dealer.calculateHandValue() < 17) {
-            dealer.hit(roundCardDeck.dealCard());
-        }
-        dealer.setStand();
-    }
-
-    /**
+/* 
      * Completes the round by calculating the final scores and awarding bets based on the result.
-     */
+
     public void completeRound() {
-        getBet(/*player chooses bet */);
+        getBet(player chooses bet );
         while (findWinner() == null) {
             playRound();
         }
@@ -148,5 +175,6 @@ public class RoundClass {
             player.setMoney(1.5 * getBet());
         }
         setFinished();
-    }
+    } 
+*/
 }

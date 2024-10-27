@@ -1,22 +1,22 @@
 /**
  * The {@code Player} class represents a player in a card game.
- * It manages the player's name, hand, current score, and status 
- * (e.g., standing or busted). The class includes methods for adding 
- * cards to the player's hand, calculating the hand's total value, 
+ * It manages the player's name, hand, current score, money, win points, 
+ * and status (e.g., standing or busted). The class includes methods 
+ * for adding cards to the player's hand, calculating the hand's total value,
  * and resetting the player's state.
  */
 public class Player {
 
     private String name;
     private Card[] hand;
-    private boolean isBusted = setBust();
+    private boolean isBusted;
     private boolean isStanding;
     private int winPoint;
     private double money;
 
     /**
      * Constructs a new {@code Player} with the specified name.
-     * Initializes the player's hand and sets default values for status and score.
+     * Initializes the player's hand and sets default values for status, score, and money.
      *
      * @param name the name of the player
      */
@@ -24,6 +24,7 @@ public class Player {
         this.name = name;
         this.hand = new Card[10];
         this.isStanding = false;
+        this.isBusted = false;
         this.money = 500;
     }
 
@@ -58,20 +59,17 @@ public class Player {
      */
     public void resetStand() {
         isStanding = false;
+        isBusted = false;
     }
 
     /**
      * Determines whether the player has busted (score > 21) and sets the bust status.
      * If the player is busted, sets the player's status to standing.
-     *
-     * @return {@code true} if the player is busted; {@code false} otherwise
      */
-    private boolean setBust() {
+    private void setBust() {
         if (calculateHandValue() > 21) {
             setStand();
-            return true;
-        } else {
-            return false;
+            this.isBusted = true;
         }
     }
 
@@ -82,6 +80,11 @@ public class Player {
         this.winPoint++;
     }
 
+    /**
+     * Updates the player's money by adding or subtracting a specified amount.
+     *
+     * @param i the amount to add to the player's current money
+     */
     public void setMoney(double i) {
         this.money = getMoney() + i;
     }
@@ -132,6 +135,11 @@ public class Player {
         return this.winPoint;
     }
 
+    /**
+     * Retrieves the player's current money.
+     *
+     * @return the amount of money the player has
+     */
     public double getMoney() {
         return this.money;
     }
@@ -185,7 +193,6 @@ public class Player {
         if (value < 0) {
             throw new IllegalArgumentException("Score cannot be negative");
         }
-
         return value;
     }
 
@@ -197,8 +204,6 @@ public class Player {
     public void hit(Card newCard) {
         if (!getIsStanding()) {
             addCard(newCard);
-        }
-        if (calculateHandValue() > 21) {
             setBust();
         }
     }
@@ -210,24 +215,5 @@ public class Player {
         for (int i = 0; i < 10; i++) {
             setHand(i, null);
         }
-    }
-
-    /**
-     * Returns a string representation of the player's status, including their name, score, 
-     * and current status (e.g., standing, busted, or still playing).
-     *
-     * @return a string representation of the player's status
-     */
-    @Override
-    public String toString() {
-        String status;
-        if (getIsBusted()) {
-            status = " is busted";
-        } else if (getIsStanding() && !getIsBusted()) {
-            status = " has stood";
-        } else {
-            status = " is still playing the round";
-        }
-        return getName() + " has a score of " + calculateHandValue() + status;
     }
 }
