@@ -15,6 +15,16 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 public class BlackjackGameUI extends JFrame {
+    
+    private CardDeck cardDeck; // Assuming cardDeck is an instance of CardDeck
+    private int playerHandValue; // Track the player's hand value
+    private int dealerHandValue; // Track the dealer's hand value
+
+    private static Player dealer;
+    private static Player player;
+    private int roundNumber;
+    private RoundClass currentRound;
+
     private JPanel playerPanel;
     private JPanel dealerPanel;
     private JPanel buttonPanel;
@@ -29,13 +39,25 @@ public class BlackjackGameUI extends JFrame {
     private JLabel dealerHandValueLabel;
     private JButton hitButton;
     private JButton standButton;
-    private JButton newGameButton;
-    private CardDeck cardDeck; // Assuming cardDeck is an instance of CardDeck
-    private int playerHandValue; // Track the player's hand value
-    private int dealerHandValue; // Track the dealer's hand value
-    private ArrayList<Card> playerHand; // Track the player's hand
+    private JButton restartGameButton;
+    private JButton newRoundButton;
+
+    /* 
+    private JButton newRoundButton;
+    */
+
+    /*private JButton newGameButton;*/
 
     public BlackjackGameUI() {
+
+        dealer = new Player("dealer");
+        player = new Player("player");
+        roundNumber = 0;
+        addRoundNumber();
+
+        playerHandValue = setPlayerHandValue();
+        dealerHandValue = setDealerHandValue();
+
         // Initialize panels and buttons
         playerPanel = new JPanel();
         dealerPanel = new JPanel();
@@ -51,7 +73,9 @@ public class BlackjackGameUI extends JFrame {
         dealerHandValueLabel = new JLabel("Dealer Hand Value: 0");
         hitButton = new JButton("Hit");
         standButton = new JButton("Stand");
-        newGameButton = new JButton("New Game");
+        restartGameButton = new JButton("Restart Game");
+        newRoundButton = new JButton("New Round");
+        /*newGameButton = new JButton("New Game"); */
 
         // Set layout for player panel to display cards horizontally and centralize them
         playerPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
@@ -73,7 +97,9 @@ public class BlackjackGameUI extends JFrame {
         // Add buttons to button panel
         buttonPanel.add(hitButton);
         buttonPanel.add(standButton);
-        buttonPanel.add(newGameButton);
+        buttonPanel.add(newRoundButton);
+        buttonPanel.add(restartGameButton);
+        /*buttonPanel.add(newGameButton); */
 
         // Add playerStatusContainer and button panel to the container panel
         containerPanel.add(playerStatusContainer, BorderLayout.NORTH);
@@ -101,56 +127,99 @@ public class BlackjackGameUI extends JFrame {
             }
         });
 
-        newGameButton.addActionListener(new ActionListener() {
+        newRoundButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // Reset the game and start a new round
+                newRound();
+            }
+        });
+
+        restartGameButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // Reset the game and start a new round
+                restartGame();
+            }
+        });
+
+        /*        newGameButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // Reset the game and start a new round
                 startNewGame();
             }
-        });
+        }) */
 
-        // Initialize the card deck and player's hand value
+        /* Initialize the card deck and player's hand value
         cardDeck = new CardDeck();
         playerHandValue = 0;
         dealerHandValue = 0;
         playerHand = new ArrayList<>();
+        
 
         // Automatically deal a card to the dealer when the UI initializes
         dealCardToDealer();
 
         // Automatically deal a card to the player when the UI initializes
         dealCardToPlayer();
+        */
 
         // Set the content pane to the background panel
         setContentPane(backgroundPanel);
+        
     }
 
-    public boolean dealCardToPlayer() {
-        Card card = cardDeck.dealCard(); // Assuming cardDeck is an instance of CardDeck
+        /**
+     * Returns the current round number.
+     * 
+     * @return the current round number
+     */
+    public int getRoundNumber() {
+        return this.roundNumber;
+    }
+
+        /**
+     * Returns the dealer Player instance.
+     * 
+     * @return the dealer player instance
+     */
+    public static Player getDealer() {
+        return dealer;
+    }
+
+    /**
+     * Returns the player Player instance.
+     * 
+     * @return the player instance
+     */
+    public static Player getPlayer() {
+        return player;
+    }
+
+    private void addRoundNumber() {
+        this.roundNumber += 1;
+        currentRound = new RoundClass(getRoundNumber());
+    }
+
+    public int setPlayerHandValue() {
+        return getPlayer().calculateHandValue();
+    }
+
+    public int setDealerHandValue() {
+        return getDealer().calculateHandValue();        
+    }
+
+
+    public boolean dealCardToPlayer() {   
+        Card card = currentRound.dealRoundCard();  
         if (card != null) {
-            playerHand.add(card); // Add card to player's hand
+            player.hit(card);
             ImageIcon cardImage = loadCardImage(card);
             JLabel cardLabel = new JLabel(cardImage);
             playerPanel.add(cardLabel);
             playerPanel.revalidate();
             playerPanel.repaint();
-
-            // Update player's hand value
-            playerHandValue += card.getRank().getValue();
-
-            // Adjust for Aces if player is busted
-            if (playerHandValue > 21) {
-                for (Card c : playerHand) {
-                    if (c.getRank() == Rank.Ace && playerHandValue > 21) {
-                        playerHandValue -= 10; // Change Ace value from 11 to 1
-                    }
-                }
-            }
-
-            // Update player's hand value label
             playerHandValueLabel.setText("Player Hand Value: " + playerHandValue);
-
-            // Check if player is busted
-            if (playerHandValue > 21) {
+            
+            if (player.getIsBusted()) {
                 statusLabel.setText("Game Status: Busted!");
                 hitButton.setEnabled(false);
                 standButton.setEnabled(false);
@@ -160,18 +229,14 @@ public class BlackjackGameUI extends JFrame {
     }
 
     public boolean dealCardToDealer() {
-        Card card = cardDeck.dealCard(); // Assuming cardDeck is an instance of CardDeck
+        Card card = currentRound.dealRoundCard();  
         if (card != null) {
+            dealer.hit(card);
             ImageIcon cardImage = loadCardImage(card);
             JLabel cardLabel = new JLabel(cardImage);
             dealerPanel.add(cardLabel);
             dealerPanel.revalidate();
             dealerPanel.repaint();
-
-            // Update dealer's hand value
-            dealerHandValue += card.getRank().getValue();
-
-            // Update dealer's hand value label
             dealerHandValueLabel.setText("Dealer Hand Value: " + dealerHandValue);
         }
         return true;
@@ -206,12 +271,8 @@ public class BlackjackGameUI extends JFrame {
                 } else {
                     ((Timer) e.getSource()).stop();
                     // Check if dealer is busted
-                    if (dealerHandValue > 21) {
-                        statusLabel.setText("Game Status: Dealer Busted! You Win!");
-                    } else if (dealerHandValue == playerHandValue) {
-                        statusLabel.setText("Game Status: Draw!");
-                    } else if (dealerHandValue >= playerHandValue) {
-                        statusLabel.setText("Game Status: Dealer Wins!");
+                    if (currentRound.findWinner() != null) {
+                        statusLabel.setText(currentRound.findWinnerToString());
                     }
                 }
             }
@@ -219,7 +280,49 @@ public class BlackjackGameUI extends JFrame {
         timer.start();
     }
 
-    private void startNewGame() {
+    private void newRound() {
+        // Reset the game and start a new round
+        playerPanel.removeAll();
+        dealerPanel.removeAll();
+        playerPanel.revalidate();
+        playerPanel.repaint();
+        dealerPanel.revalidate();
+        dealerPanel.repaint();
+        statusLabel.setText("Game Status: ");
+        playerHandValueLabel.setText("Player Hand Value: 0");
+        dealerHandValueLabel.setText("Dealer Hand Value: 0");
+        hitButton.setEnabled(true);
+        standButton.setEnabled(true);
+        addRoundNumber();
+        dealCardToDealer();
+        dealCardToPlayer();
+        dealCardToPlayer();
+    }
+
+    private void restartGame() {
+        // Reset the game and start a new round
+        playerPanel.removeAll();
+        dealerPanel.removeAll();
+        playerPanel.revalidate();
+        playerPanel.repaint();
+        dealerPanel.revalidate();
+        dealerPanel.repaint();
+        statusLabel.setText("Game Status: ");
+        playerHandValueLabel.setText("Player Hand Value: 0");
+        dealerHandValueLabel.setText("Dealer Hand Value: 0");
+        hitButton.setEnabled(true);
+        standButton.setEnabled(true);
+        player = new Player("player");
+        dealer = new Player("dealer");
+        this.roundNumber = 0;
+        RoundClass.resetAllRounds();
+        addRoundNumber();
+        dealCardToDealer();
+        dealCardToPlayer();
+        dealCardToPlayer();
+    }
+
+    /* private void startNewGame() {
         // Reset the game and start a new round
         playerPanel.removeAll();
         dealerPanel.removeAll();
@@ -237,8 +340,7 @@ public class BlackjackGameUI extends JFrame {
         standButton.setEnabled(true);
         cardDeck = new CardDeck();
         dealCardToDealer();
-        dealCardToPlayer();
-    }
+        dealCardToPlayer(); */
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {

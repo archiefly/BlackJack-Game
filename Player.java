@@ -9,7 +9,7 @@ public class Player {
 
     private String name;
     private Card[] hand;
-    private boolean isBusted = setBust();
+    private boolean isBusted;
     private boolean isStanding;
     private int winPoint;
     private double money;
@@ -24,6 +24,7 @@ public class Player {
         this.name = name;
         this.hand = new Card[10];
         this.isStanding = false;
+        this.isBusted = false;
         this.money = 500;
     }
 
@@ -66,12 +67,10 @@ public class Player {
      *
      * @return {@code true} if the player is busted; {@code false} otherwise
      */
-    private boolean setBust() {
+    private void setBust() {
         if (calculateHandValue() > 21) {
             setStand();
-            return true;
-        } else {
-            return false;
+            this.isBusted = true;
         }
     }
 
@@ -185,7 +184,6 @@ public class Player {
         if (value < 0) {
             throw new IllegalArgumentException("Score cannot be negative");
         }
-
         return value;
     }
 
@@ -197,8 +195,6 @@ public class Player {
     public void hit(Card newCard) {
         if (!getIsStanding()) {
             addCard(newCard);
-        }
-        if (calculateHandValue() > 21) {
             setBust();
         }
     }
