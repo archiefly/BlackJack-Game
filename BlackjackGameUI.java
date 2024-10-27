@@ -13,6 +13,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.JSpinner;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 public class BlackjackGameUI extends JFrame {
     
@@ -28,17 +32,24 @@ public class BlackjackGameUI extends JFrame {
     private JPanel buttonPanel;
     private JPanel statusPanel;
     private JPanel containerPanel; // Container panel to hold playerPanel and buttonPanel
-    private JPanel playerStatusContainer; // Container panel to hold playerPanel and statusLabel
+    private JPanel playerStatusContainerTop; // Container panel to hold playerPanel and statusLabel
+    private JPanel playerStatusContainerBottom;
+    private JPanel playerStatusContainer;
     private JPanel playerHandValuePanel; // Panel to center player hand value label
     private JPanel dealerHandValuePanel; // Panel to center dealer hand value label
     private JPanel gameStatusPanel; // Panel to center game status label
+    private JPanel betPanel;
+    private JPanel moneyPanel;
     private JLabel statusLabel;
     private JLabel playerHandValueLabel;
     private JLabel dealerHandValueLabel;
+    private JLabel betLabel;
+    private JLabel moneyLabel;
     private JButton hitButton;
     private JButton standButton;
     private JButton restartGameButton;
     private JButton newRoundButton;
+    private JSpinner betSpinner;
 
     public BlackjackGameUI() {
 
@@ -53,17 +64,25 @@ public class BlackjackGameUI extends JFrame {
         buttonPanel = new JPanel();
         statusPanel = new JPanel();
         containerPanel = new JPanel(new BorderLayout()); // Container panel with BorderLayout
-        playerStatusContainer = new JPanel(new BorderLayout()); // Container panel with BorderLayout
+        betPanel = new JPanel();
+        betPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+        playerStatusContainerTop = new JPanel(new BorderLayout()); // Container panel with BorderLayout
+        playerStatusContainerBottom = new JPanel(new BorderLayout());
+        playerStatusContainer = new JPanel(new BorderLayout());
         playerHandValuePanel = new JPanel(new FlowLayout(FlowLayout.CENTER)); // Panel to center player hand value label
         dealerHandValuePanel = new JPanel(new FlowLayout(FlowLayout.CENTER)); // Panel to center dealer hand value label
         gameStatusPanel = new JPanel(new FlowLayout(FlowLayout.CENTER)); // Panel to center game status label
+        moneyPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         statusLabel = new JLabel("Game Status: ");
         playerHandValueLabel = new JLabel("Player Hand Value: 0");
         dealerHandValueLabel = new JLabel("Dealer Hand Value: 0");
+        betLabel = new JLabel("Bet (€)");
+        moneyLabel = new JLabel("Betting Chips Available: " + player.getMoney() + "€");
         hitButton = new JButton("Hit");
         standButton = new JButton("Stand");
         restartGameButton = new JButton("Restart Game");
         newRoundButton = new JButton("New Round");
+        betSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 10, 1));
         // Set layout for player panel to display cards horizontally and centralize them
         playerPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
         // Set layout for dealer panel to centralize the dealer's card
@@ -71,19 +90,28 @@ public class BlackjackGameUI extends JFrame {
 
         // Add player hand value label to playerHandValuePanel
         playerHandValuePanel.add(playerHandValueLabel);
+        moneyPanel.add(moneyLabel);
         // Add dealer hand value label to dealerHandValuePanel
         dealerHandValuePanel.add(dealerHandValueLabel);
         // Add game status label to gameStatusPanel
         gameStatusPanel.add(statusLabel);
 
         // Add player panel and status label to the playerStatusContainer
-        playerStatusContainer.add(gameStatusPanel, BorderLayout.NORTH);
-        playerStatusContainer.add(playerHandValuePanel, BorderLayout.CENTER);
-        playerStatusContainer.add(playerPanel, BorderLayout.SOUTH);
+        playerStatusContainerTop.add(gameStatusPanel, BorderLayout.NORTH);
+        playerStatusContainerTop.add(moneyPanel, BorderLayout.SOUTH);
+        playerStatusContainerBottom.add(playerHandValuePanel, BorderLayout.NORTH);
+        playerStatusContainerBottom.add(playerPanel, BorderLayout.SOUTH);
+
+        playerStatusContainer.add(playerStatusContainerTop, BorderLayout.NORTH);
+        playerStatusContainer.add(playerStatusContainerBottom, BorderLayout.SOUTH);
+
+        betPanel.add(betLabel);
+        betPanel.add(betSpinner);
 
         // Add buttons to button panel
         buttonPanel.add(hitButton);
         buttonPanel.add(standButton);
+        buttonPanel.add(betPanel);
         buttonPanel.add(newRoundButton);
         buttonPanel.add(restartGameButton);
         /*buttonPanel.add(newGameButton); */
@@ -104,6 +132,7 @@ public class BlackjackGameUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 // Call logic to deal a card to the player
                 dealCardToPlayer();
+                betSpinner.setEnabled(false);
             }
         });
 
@@ -111,6 +140,15 @@ public class BlackjackGameUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 // Call logic for standing and ending player's turn
                 handleStand();
+                betSpinner.setEnabled(false);
+            }
+        });
+
+        betSpinner.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                int betValue = (int) betSpinner.getValue();
+                currentRound.setBet(betValue);
             }
         });
 
@@ -264,6 +302,11 @@ public class BlackjackGameUI extends JFrame {
                     // Check if dealer is busted
                     if (currentRound.findWinner() != null) {
                         statusLabel.setText(currentRound.findWinnerToString());
+                        currentRound.giveBet();
+                        moneyLabel.setText("Betting Chips Available: " + player.getMoney() + "€"); // Or however you get the updated bet value
+                        moneyLabel.revalidate();
+                        moneyLabel.repaint();
+
                     }
                 }
             }
@@ -288,6 +331,7 @@ public class BlackjackGameUI extends JFrame {
         dealerHandValueLabel.setText("Dealer Hand Value: " + setDealerHandValue());
         hitButton.setEnabled(true);
         standButton.setEnabled(true);
+        betSpinner.setEnabled(true);
     }
 
     private void restartGame() {
@@ -311,6 +355,7 @@ public class BlackjackGameUI extends JFrame {
         dealerHandValueLabel.setText("Dealer Hand Value: " + setDealerHandValue());
         hitButton.setEnabled(true);
         standButton.setEnabled(true);
+        betSpinner.setEnabled(true);
 
     }
 

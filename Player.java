@@ -25,7 +25,7 @@ public class Player {
         this.hand = new Card[10];
         this.isStanding = false;
         this.isBusted = false;
-        this.money = 500;
+        this.money = 50;
     }
 
     /**

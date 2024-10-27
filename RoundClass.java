@@ -148,6 +148,16 @@ public class RoundClass {
         }
     }
 
+    public void giveBet() {
+        if (findWinner() == dealer) {
+            dealer.setMoney(getBet());
+            player.setMoney(-getBet());
+        } else if (findWinner() == player) {
+            dealer.setMoney(-1.5 * getBet());
+            player.setMoney(1.5 * getBet());
+        }
+    }
+
     public String findWinnerToString() {
         
         if (findWinner() == player) {
@@ -158,6 +168,8 @@ public class RoundClass {
             return "Game Status: Draw!";
         }
     }
+
+
 
 /* 
      * Completes the round by calculating the final scores and awarding bets based on the result.
