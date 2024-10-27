@@ -59,6 +59,7 @@ public class Player {
      */
     public void resetStand() {
         isStanding = false;
+        isBusted = false;
     }
 
     /**

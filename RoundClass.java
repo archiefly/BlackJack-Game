@@ -107,7 +107,7 @@ public class RoundClass {
      * Determines whether the round is finished based on both players' states.
      *
      * @return {@code true} if the round is complete, otherwise {@code false}
-     */
+     *
     private void setFinished() {
         if (dealer.getIsStanding() && player.getIsStanding()) {
             if (findWinner() != null) {
@@ -115,6 +115,7 @@ public class RoundClass {
             }
         }
     }
+    */
 
     public Card dealRoundCard() {
         return getRoundCardDeck().dealCard();
@@ -128,17 +129,22 @@ public class RoundClass {
     public Player findWinner() {
         if (player.getIsBusted() && dealer.getIsBusted()) {
             return null;
-        } else if (!player.getIsBusted()) {
+        } else if (!player.getIsBusted() && dealer.getIsBusted()) {
+            player.addWinPoint();
+            return player;
+        } else if (player.getIsBusted() && !dealer.getIsBusted()) {
+            dealer.addWinPoint();
+            return dealer;
+        } else {
             if (player.calculateHandValue() > dealer.calculateHandValue()) {
+                player.addWinPoint();
                 return player;
-            } else if ((player.calculateHandValue() < dealer.calculateHandValue()) 
-                && !dealer.getIsBusted()) {
+            } else if (player.calculateHandValue() < dealer.calculateHandValue()) {
+                dealer.addWinPoint();
                 return dealer;
             } else {
                 return null;
             }
-        } else {
-            return dealer;
         }
     }
 
