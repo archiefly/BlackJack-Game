@@ -4,8 +4,8 @@
  * playing cards.
  */
 public enum Suit {
-    Hearts,
-    Diamonds,
-    Clubs,
-    Spades
+    hearts,
+    diamonds,
+    clubs,
+    spades
 }

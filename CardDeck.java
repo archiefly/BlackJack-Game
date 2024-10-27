@@ -22,14 +22,14 @@ public class CardDeck {
 
     /**
      * Constructs a new {@code CardDeck} with a full set of cards.
-     * Initializes the deck with all combinations of suits and ranks,
+     * Initializes the deck with all combinations of ranks and suits,
      * then shuffles the deck to randomize the order of the cards.
      */
     public CardDeck() {
         setDeck();
-        for (Suit suit : Suit.values()) {
-            for (Rank rank : Rank.values()) {
-                cards.add(new Card(suit, rank));
+        for (Rank rank : Rank.values()) {
+            for (Suit suit : Suit.values()) {
+                cards.add(new Card(rank, suit));
             }
         }
         shuffle();
