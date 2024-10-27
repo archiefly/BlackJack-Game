@@ -1,10 +1,11 @@
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -79,9 +80,11 @@ public class BlackjackGameUI extends JFrame {
         containerPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         // Add panels to the frame
-        add(containerPanel, BorderLayout.SOUTH); // Add container panel to the bottom
-        add(dealerHandValuePanel, BorderLayout.NORTH); // Add dealer hand value panel to the top
-        add(dealerPanel, BorderLayout.CENTER); // Add dealer panel to the center
+        BackgroundPanel backgroundPanel = new BackgroundPanel();
+        backgroundPanel.setLayout(new BorderLayout());
+        backgroundPanel.add(containerPanel, BorderLayout.SOUTH); // Add container panel to the bottom
+        backgroundPanel.add(dealerHandValuePanel, BorderLayout.NORTH); // Add dealer hand value panel to the top
+        backgroundPanel.add(dealerPanel, BorderLayout.CENTER); // Add dealer panel to the center
 
         // Add action listeners to buttons
         hitButton.addActionListener(new ActionListener() {
@@ -116,6 +119,9 @@ public class BlackjackGameUI extends JFrame {
 
         // Automatically deal a card to the player when the UI initializes
         dealCardToPlayer();
+
+        // Set the content pane to the background panel
+        setContentPane(backgroundPanel);
     }
 
     public boolean dealCardToPlayer() {
@@ -172,13 +178,8 @@ public class BlackjackGameUI extends JFrame {
     }
 
     private ImageIcon loadCardImage(Card card) {
-        String cardName;
-        if (card.getRank().getValue() >= 2 && card.getRank().getValue() <= 10) {
-            cardName = card.getRank().getValue() + "_" + card.getSuit().name().toLowerCase() + ".png";
-        } else {
-            cardName = card.getRank().name().toLowerCase() + "_" + card.getSuit().name().toLowerCase() + ".png";
-        }
-        String imagePath = "/images/cards/" + cardName;
+        String cardName = card.getRank().name().toLowerCase() + "_" + card.getSuit().name().toLowerCase() + ".png";
+        String imagePath = "/Images/cards/" + cardName;
         java.net.URL imgURL = getClass().getResource(imagePath);
         if (imgURL != null) {
             ImageIcon originalIcon = new ImageIcon(imgURL);
@@ -207,6 +208,8 @@ public class BlackjackGameUI extends JFrame {
                     // Check if dealer is busted
                     if (dealerHandValue > 21) {
                         statusLabel.setText("Game Status: Dealer Busted! You Win!");
+                    } else if (dealerHandValue == playerHandValue) {
+                        statusLabel.setText("Game Status: Draw!");
                     } else if (dealerHandValue >= playerHandValue) {
                         statusLabel.setText("Game Status: Dealer Wins!");
                     }
@@ -242,9 +245,31 @@ public class BlackjackGameUI extends JFrame {
             public void run() {
                 BlackjackGameUI gameUI = new BlackjackGameUI();
                 gameUI.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                gameUI.setSize(800, 600);
+
+                // Get the screen size and set the frame to full screen
+                Toolkit toolkit = Toolkit.getDefaultToolkit();
+                int screenWidth = toolkit.getScreenSize().width;
+                int screenHeight = toolkit.getScreenSize().height;
+                gameUI.setSize(screenWidth, screenHeight);
+
                 gameUI.setVisible(true);
             }
         });
+    }
+}
+
+class BackgroundPanel extends JPanel {
+    private Image backgroundImage;
+
+    public BackgroundPanel() {
+        // Load the background image
+        backgroundImage = new ImageIcon(getClass().getResource("/Images/cards/background.jpg")).getImage();
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        // Draw the background image
+        g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
     }
 }
